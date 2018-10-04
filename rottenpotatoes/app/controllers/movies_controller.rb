@@ -1,8 +1,21 @@
 class MoviesController < ApplicationController
   
   def movie_params
-    params.require(:movie).permit(:title, :rating, :description, :release_date)
+    params.require(:movie).permit(:title, :rating, :description, :release_date, :director)
   end
+
+
+  def similarMovies
+    
+    @movie = Movie.find(params[:movie_id])
+    @similar_movies = Movie.where('id != ? AND director = ?', params[:movie_id], @movie.director)
+    
+    if @similar_movies.empty?
+      flash[:warning] = ("'#{@movie.title}' has no director info")
+      redirect_to movies_path
+    end
+  end
+
 
   def show
     id = params[:id] # retrieve movie ID from URI route
